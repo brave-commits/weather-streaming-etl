@@ -1,0 +1,65 @@
+version: '3.5'
+
+networks: 
+  weather_kafka:
+    name: weather_kafka
+
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper
+    networks: 
+      - weather_kafka
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+
+  broker:
+    image: confluentinc/cp-kafka:latest
+    container_name: broker
+    ports: 
+      - "19092:19092"
+    networks: 
+      - weather_kafka
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:9092,CONNECTIONS_FROM_HOST://localhost:19092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONNECTIONS_FROM_HOST:PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  weather-client:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: weather-client
+    depends_on: 
+      - broker
+    networks: 
+      - weather_kafka
+    entrypoint: 
+      - bash 
+      - -c 
+      - |
+        echo 'Giving Kafka a bit of time to start up…'
+        sleep 30
+        # Run the client code
+        python run.py broker:9092
+
+  #sqlserver:
+  # image: mcr.microsoft.com/azure-sql-edge
+  # ports:
+  #   - 1433:1433
+  # volumes:
+  #   - /Users/erichayes/VSCodeProjects/WeatherApp/logs/.sql/data:/var/opt/mssql/data
+  #   - /Users/erichayes/VSCodeProjects/WeatherApp/logs/.sql/log:/var/opt/mssql/log
+  #   - /Users/erichayes/VSCodeProjects/WeatherApp/logs/.sql/secrets:/var/opt/mssql/secrets
+  # environment:
+  #   ACCEPT_EULA: "Y"
+  # env_file:
+  #   - .env
+  # depends_on:
+  #   - kafka
+  #   - zookeeper
+        
