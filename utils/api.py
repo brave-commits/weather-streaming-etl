@@ -1,6 +1,6 @@
 import requests
 from config.config import ParamsFactory
-from utils.logging import Logger
+from logger import Logger
 
 def get_request():
     try:

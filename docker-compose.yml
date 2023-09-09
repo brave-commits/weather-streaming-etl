@@ -47,19 +47,18 @@ services:
         # Run the client code
         python run.py broker:9092
 
-  #sqlserver:
-  # image: mcr.microsoft.com/azure-sql-edge
-  # ports:
-  #   - 1433:1433
-  # volumes:
-  #   - /Users/erichayes/VSCodeProjects/WeatherApp/logs/.sql/data:/var/opt/mssql/data
-  #   - /Users/erichayes/VSCodeProjects/WeatherApp/logs/.sql/log:/var/opt/mssql/log
-  #   - /Users/erichayes/VSCodeProjects/WeatherApp/logs/.sql/secrets:/var/opt/mssql/secrets
-  # environment:
-  #   ACCEPT_EULA: "Y"
-  # env_file:
-  #   - .env
-  # depends_on:
-  #   - kafka
-  #   - zookeeper
+  sqlserver:
+   image: mcr.microsoft.com/azure-sql-edge
+   ports:
+     - 1433:1433
+   volumes:
+     - /Users/erichayes/VSCodeProjects/WeatherApp/logs/.sql/data:/var/opt/mssql/data
+     - /Users/erichayes/VSCodeProjects/WeatherApp/logs/.sql/log:/var/opt/mssql/log
+     - /Users/erichayes/VSCodeProjects/WeatherApp/logs/.sql/secrets:/var/opt/mssql/secrets
+   environment:
+     ACCEPT_EULA: "Y"
+   env_file:
+     - .env
+   depends_on:
+     - broker
         

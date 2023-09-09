@@ -1,9 +1,11 @@
-import requests
-#from config.config import ParamsFactory
-from utils.logging import Logger
 from utils.api import get_request
 from utils.kafka import producer, consumer
+import time
 
-resp = get_request()
-producer(resp)
+def weather_pub_sub():
+    while True:
+        resp = get_request()
+        producer(resp)
+        consumer()
+        time.sleep(600)
 

@@ -2,7 +2,7 @@ import uuid
 import json
 from confluent_kafka import Consumer, Producer, KafkaError, KafkaException
 from config.config import ParamsFactory 
-from utils.logging import Logger
+from logger import Logger
 
 params = ParamsFactory.create_params()
 message_id = uuid.uuid4()
@@ -27,7 +27,7 @@ def consumer():
                 'auto.offset.reset': params.kafka_offset
             }
         )
-        topic = params.topic
+        topic = params.kafka_topic
         consumer.subscribe([topic])
         while True:
             msg = consumer.poll(1.0)
@@ -36,11 +36,11 @@ def consumer():
             if msg.error():
                 if msg.error().code() == KafkaError._PARTITION_EOF:
                     partition_end = f"%% {msg.topic()} [{msg.partition()}] reached end of offset {msg.offset()}"
-                    Logger.info(partition_end)
+                    Logger.log_info(partition_end)
                 else:
                     raise KafkaException(msg.error())
             log_message = f'{msg.topic()} consumed | {message_id}'
-            Logger.info(log_message)
+            Logger.log_info(log_message)
             return msg.value().decode('utf-8')
         
     except Exception as e:
