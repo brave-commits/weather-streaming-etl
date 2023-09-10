@@ -47,8 +47,7 @@ ptyprocess==0.7.0
 pure-eval==0.2.2
 Pygments==2.15.1
 pylint==2.17.5
-pyodbc
-#==4.0.34
+pyodbc==4.0.34
 pytest==7.3.2
 python-dateutil==2.8.2
 python-dotenv==1.0.0

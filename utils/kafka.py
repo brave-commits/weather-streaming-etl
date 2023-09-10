@@ -2,7 +2,10 @@ import uuid
 import json
 from confluent_kafka import Consumer, Producer, KafkaError, KafkaException
 from config.config import ParamsFactory 
-from logger import Logger
+from utils.logger import Logger
+from utils.database import DBSession
+from utils.transform import JsonFlattener, DFConverter
+import pandas as pd
 
 params = ParamsFactory.create_params()
 message_id = uuid.uuid4()
@@ -41,7 +44,14 @@ def consumer():
                     raise KafkaException(msg.error())
             log_message = f'{msg.topic()} consumed | {message_id}'
             Logger.log_info(log_message)
-            return msg.value().decode('utf-8')
+            df_message= msg.value().decode('utf-8')
+            json_flat = JsonFlattener.flatten(df_message)
+            df = DFConverter.convert_json(json_flat)
+            db_session = DBSession.create_session()
+            session = db_session.session
+            
+
+          
         
     except Exception as e:
         Logger.log_error(e)
