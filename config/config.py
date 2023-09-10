@@ -4,13 +4,14 @@ import os
 
 class LoadParams:
     def __init__(self):
-        load_dotenv()
+        load_dotenv('.env-app')
+        load_dotenv('.env-dbconn')
         self.db_driver = os.environ.get('DB_DRIVER')
         self.db_server = os.environ.get('DB_SERVER')
         self.db_database = os.environ.get('DB_DATABASE')
         self.db_port = os.environ.get('DB_PORT')
         self.db_usr = os.environ.get('DB_USR')
-        self.db_pwd = os.environ.get('DB_PWD')
+        self.db_pwd = os.environ.get('MSSQL_SA_PASSWORD')
         self.db_table = os.environ.get('DB_TABLE')
         self.db_schema = os.environ.get('DB_SCHEMA')
         self.db_trust_cert = os.environ.get('DB_TRUST_CERT')

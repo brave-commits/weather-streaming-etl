@@ -28,14 +28,15 @@ class DBSession(BaseDBConn):
         self.session = Session()
 
     @classmethod
-    def create_session_dst(cls):
+    def create_session(cls):
         db_session_dst = cls(params.db_server, params.db_database, params.db_driver, params.db_usr, params.db_pwd)
         return db_session_dst
 
     @classmethod
     def df_to_sql(cls, df):
         session = cls(params.db_server, params.db_database, params.db_driver, params.db_usr, params.db_pwd).session
-        df.to_sql(name=params.db_table, schema=params.db_schema, con=session.bind, if_exists='replace', index=True)
+        df.to_sql(name=params.db_table, schema=params.db_schema, con=session.bind, if_exists='append', index=True)
+        session.close()
 
 
 Base = declarative_base()

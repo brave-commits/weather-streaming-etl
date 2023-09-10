@@ -18,16 +18,13 @@ services:
     container_name: broker
     ports: 
       - "19092:19092"
+      - "9092:9092"
     networks: 
       - weather_kafka
     depends_on:
       - zookeeper
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:9092,CONNECTIONS_FROM_HOST://localhost:19092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONNECTIONS_FROM_HOST:PLAINTEXT
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    env_file:
+      - .env-kafka
 
   weather-client:
     build:
@@ -44,21 +41,19 @@ services:
       - |
         echo 'Giving Kafka a bit of time to start up…'
         sleep 30
-        # Run the client code
         python run.py broker:9092
 
   sqlserver:
-   image: mcr.microsoft.com/azure-sql-edge
+   image: mcr.microsoft.com/azure-sql-edge:latest
+   container_name: sqlserver
    ports:
      - 1433:1433
    volumes:
-     - /Users/erichayes/VSCodeProjects/WeatherApp/logs/.sql/data:/var/opt/mssql/data
-     - /Users/erichayes/VSCodeProjects/WeatherApp/logs/.sql/log:/var/opt/mssql/log
-     - /Users/erichayes/VSCodeProjects/WeatherApp/logs/.sql/secrets:/var/opt/mssql/secrets
-   environment:
-     ACCEPT_EULA: "Y"
+     - ./logs/sql/data:/var/opt/mssql/data
+     - ./logs/sql/log:/var/opt/mssql/log
+     - ./logs/sql/secrets:/var/opt/mssql/secrets
    env_file:
-     - .env
+     - .env-dbconn
    depends_on:
      - broker
         

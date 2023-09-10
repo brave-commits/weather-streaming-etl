@@ -4,7 +4,7 @@ class Logger:
     @classmethod
     def get_logger(cls):
         logging.basicConfig(
-            filename= './.logs/app.log',
+            filename= './logs/app.log',
             level=logging.INFO,
             filemode='a',
             format=f"[%(asctime)s] %(levelname)s [%(name)s.%(funcName)s:%(lineno)d] : %(message)s",
