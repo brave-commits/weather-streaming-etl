@@ -2,13 +2,14 @@ import requests
 from config.config import ParamsFactory
 from utils.logger import Logger
 
-def get_request():
+
+def get_request(lat, long):
     try:
         params = ParamsFactory.create_params()
         url = params.weather_url
         params = {
-            'lat': params.weather_lat,
-            'lon': params.weather_lon,
+            'lat': lat,
+            'lon': long,
             'units': params.weather_units,
             'appid': params.weather_api_key
 
