@@ -11,8 +11,9 @@ import time
 params = ParamsFactory.create_params()
 
 
-def producer(data, message_id):
+def producer(data):
     try:
+        message_id = uuid.uuid4()
         producer = Producer({'bootstrap.servers': params.kafka_bootstrap})
         topic = params.kafka_topic
         producer.produce(topic, key=None, value=json.dumps(data))
@@ -22,8 +23,9 @@ def producer(data, message_id):
     except Exception as e:
         Logger.log_error(f'Failed to send data to {topic}: {e} | {message_id}')
 
-def consumer(message_id):
+def consumer():
     try:
+        message_id = uuid.uuid4()
         consumer = Consumer(
             {
                 'bootstrap.servers': params.kafka_bootstrap,
@@ -37,9 +39,9 @@ def consumer(message_id):
         
         while True:
             current_time = time.time()
-            if current_time - start_time >= 30:
+            if current_time - start_time >= 60:
                 break
-            msg = consumer.poll(1.0)
+            msg = consumer.poll(30.0)
             if msg is None:
                 continue
             if msg.error():
@@ -62,7 +64,9 @@ def consumer(message_id):
                 Logger.log_info(f'Dataframe inserted into {params.db_schema}.{params.db_table}. | {message_id}')
         
     except Exception as e:
+        consumer.close()
         Logger.log_error(e)
 
     finally:
-        Logger.log_info("All available messages consumed.")
+        consumer.close()
+        Logger.log_info("Consumer exited after 30 seconds of polling.")
