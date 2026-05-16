@@ -1,5 +1,16 @@
-from producer import weather_pub_sub
+import asyncio
 
-if __name__ == '__main__':
-    weather_pub_sub()
+from pipelines.consumer import consume_loop
+from pipelines.producer import produce_loop
+from utils.database import init_db
+from utils.logger import logger
 
+
+async def main() -> None:
+    await init_db()
+    logger.info("pipeline_started")
+    await asyncio.gather(produce_loop(), consume_loop())
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
