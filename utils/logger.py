@@ -1,24 +1,12 @@
-import logging 
+import structlog
 
-class Logger:
-    @classmethod
-    def get_logger(cls):
-        logging.basicConfig(
-            filename= './logs/app.log',
-            level=logging.INFO,
-            filemode='a',
-            format=f"[%(asctime)s] %(levelname)s [%(name)s.%(funcName)s:%(lineno)d] : %(message)s",
-            datefmt="%Y=%m-%d %H:%M:%S"
-        )
+structlog.configure(
+    processors=[
+        structlog.stdlib.add_log_level,
+        structlog.processors.TimeStamper(fmt="iso"),
+        structlog.processors.JSONRenderer(),
+    ],
+    wrapper_class=structlog.make_filtering_bound_logger(20),  # INFO
+)
 
-        return logging.getLogger('WeatherAppLogger')
-    
-    @classmethod
-    def log_info(cls, message):
-        logger = cls.get_logger()
-        logger.info(message)
-
-    @classmethod
-    def log_error(cls, exception=None):
-        logger = cls.get_logger()
-        logger.error(f'Exception: {exception}', exc_info=True)
+logger = structlog.get_logger()
